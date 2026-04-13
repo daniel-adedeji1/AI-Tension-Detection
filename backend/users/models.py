@@ -1,17 +1,28 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-class User(AbstractUser):
-    phone = models.CharField(max_length=20, blank=True, default='')
-    is_manager = models.BooleanField(default=False)
+class User(models.Model):
+    employee_id = models.AutoField(primary_key=True, auto_created=True)
+    e_first_name = models.CharField(max_length=150, blank=True, default='')
+    e_last_name = models.CharField(max_length=150, blank=True, default='')
+    e_email = models.EmailField(blank=True, default='')
+    e_phone = models.CharField(max_length=20, blank=True, default='')
+    e_password = models.CharField(max_length=255, blank=True, default='')
+    e_password_hash = models.CharField(max_length=255, blank=True, default='')
+    role = models.BooleanField(default=False)
 
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='+',
-        blank=True,
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='+',
-        blank=True,
-    )
+    USERNAME_FIELD = 'employee_id'
+    REQUIRED_FIELDS = []
+
+    class Meta:
+        db_table = 'employee'
+        
+    def __str__(self):
+        return f"{self.employee_id} - {self.e_first_name} {self.e_last_name}"
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    @property
+    def is_authenticated(self):
+        return True
