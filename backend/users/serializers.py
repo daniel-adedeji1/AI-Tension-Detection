@@ -7,18 +7,18 @@ class UserCreateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('e_first_name','e_last_name', 'e_phone', 'e_email', 'e_password', 'role')
+        fields = ('e_firstname','e_lastname', 'e_phone', 'e_email', 'e_password', 'is_manager')
     
     def create(self, validated_data):
         password = validated_data.pop('e_password')
         hashed_password = make_password(password)
         user = User.objects.create(
-            e_first_name=validated_data['e_first_name'],
-            e_last_name=validated_data['e_last_name'],
+            e_firstname=validated_data['e_firstname'],
+            e_lastname=validated_data['e_lastname'],
             e_password_hash=hashed_password,
             e_email=validated_data.get('e_email', ''),
             e_phone=validated_data.get('e_phone', ''),
-            role=validated_data['role'],
+            is_manager=validated_data['is_manager'],
         )
         return user
 
@@ -26,6 +26,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('employee_id', 'e_first_name','e_last_name', 'e_phone', 'e_email', 'e_password_hash', 'role')
+        fields = ('employee_id', 'e_firstname','e_lastname', 'e_phone', 'e_email', 'e_password_hash', 'is_manager')
         read_only_fields = ('employee_id', 'e_password_hash')
         
