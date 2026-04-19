@@ -25,3 +25,21 @@ class User(models.Model):
     @property
     def is_authenticated(self):
         return True
+    
+"""class Video(models.Model):
+    video_id = models.AutoField(primary_key=True, auto_created=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, default='')
+    category = models.CharField(max_length=100, blank=True, default='')
+    url = models.URLField()
+
+    class Meta:
+        db_table = 'video'
+        """
+
+class Alert(models.Model):
+    event_id = models.UUIDField(primary_key=True)
+    camera_id = models.CharField(max_length=100)
+    employee_name = models.CharField(max_length=255, blank=True, default='')
+    trigger_reason = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)

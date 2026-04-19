@@ -1,5 +1,6 @@
 asgiref
 Django
+daphne
 django-cors-headers
 djangorestframework
 pytz

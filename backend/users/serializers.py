@@ -1,4 +1,4 @@
-from .models import User
+from .models import Alert, User #, Video
 from rest_framework import serializers # type: ignore
 from django.contrib.auth.hashers import make_password
 
@@ -28,4 +28,15 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('employee_id', 'e_firstname','e_lastname', 'e_phone', 'e_email', 'e_password_hash', 'is_manager')
         read_only_fields = ('employee_id', 'e_password_hash')
-        
+
+
+class AlertSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Alert
+        fields = ('event_id', 'camera_id', 'employee_name', 'trigger_reason', 'timestamp')
+"""        
+class VideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Video
+        fields = ('video_id', 'title', 'description', 'category', 'url')
+        """

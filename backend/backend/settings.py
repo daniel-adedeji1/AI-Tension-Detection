@@ -32,6 +32,20 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+
+def env_flag(name, default=False):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def env_str(name, default=""):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip()
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "users.authentication.CustomSessionAuthentication",
@@ -45,6 +59,7 @@ REST_FRAMEWORK = {
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -53,6 +68,7 @@ INSTALLED_APPS = [
     "users",
     "rest_framework",
     "corsheaders",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -84,19 +100,39 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = "backend.asgi.application"
 
+CHANNEL_LAYER_BACKEND = os.getenv(
+    "CHANNEL_LAYER_BACKEND",
+    "inmemory" if DEBUG else "redis",
+).strip().lower()
+
+if CHANNEL_LAYER_BACKEND == "inmemory":
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        }
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(
+                    os.getenv("REDIS_HOST", "127.0.0.1"),
+                    int(os.getenv("REDIS_PORT", "6379")),
+                )],
+            },
+        },
+    }
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tensiondb',
-        'USER': 'postgres',
-        'PASSWORD': 'capstone',
-        'HOST': '10.122.98.5',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -141,3 +177,17 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = 'users.User'
+ENABLE_ALERT_TEST_ENDPOINT = env_flag("ENABLE_ALERT_TEST_ENDPOINT", DEBUG)
+ZMQ_INGEST_CONNECT_ADDRESS = env_str(
+    "ZMQ_INGEST_CONNECT_ADDRESS",
+    env_str("ZMQ_INGEST_ADDRESS", "tcp://127.0.0.1:5555"),
+)
+ZMQ_INGEST_BIND_ADDRESS = env_str(
+    "ZMQ_INGEST_BIND_ADDRESS",
+    "tcp://*:5555",
+)
+AUTO_START_ZMQ_LISTENER = env_flag("AUTO_START_ZMQ_LISTENER", False)
+ALERT_TEST_TRANSPORT = env_str(
+    "ALERT_TEST_TRANSPORT",
+    "zmq",
+).lower()
