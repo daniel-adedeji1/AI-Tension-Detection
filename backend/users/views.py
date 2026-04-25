@@ -128,7 +128,7 @@ def video_stream(request, video_id):
         dbname="tensiondb",
         user="postgres",
         password="capstone",
-        host="10.122.96.28",
+        host="10.127.8.3",
         port=5432
     )
 

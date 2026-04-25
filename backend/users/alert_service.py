@@ -27,7 +27,7 @@ def process_alert_packet(data):
             event_id=data["event_id"],
             camera_id=data["camera_id"],
             trigger_reason=data["trigger_reason"],
-            employee_name=data.get("employee_name", ""),
+            employee_name=data.get("employee_name", "DEMO EMPLOYEE"),
         )
 
         payload = {
